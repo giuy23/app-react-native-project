@@ -7,7 +7,9 @@ import {
 } from "react-native";
 import React from "react";
 import { Image } from "react-native";
-
+import { useState } from "react";
+import ModalHotel from "./Hotel/ModalHotel";
+import ModalDestination from "./Destination/ModalDestination";
 const dataPlaces = [
   {
     id: "1",
@@ -79,9 +81,13 @@ const dataHotels = [
 ];
 
 const Home = () => {
-  const renderItem = ({ item }) => (
-    <View>
-      <TouchableOpacity style={styles.item}>
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+
+  const renderItemHotel = ({ item }) => (
+    <View >
+      <TouchableOpacity onPress={() => setSelectedHotel(item)}
+      style={styles.item}>
         <View>
           <Image source={{ uri: item.image }} style={styles.image} />
         </View>
@@ -91,6 +97,23 @@ const Home = () => {
       </TouchableOpacity>
     </View>
   );
+
+  const renderItemDestinations = ({ item }) => (
+    <View>
+      <TouchableOpacity
+        onPress={() => setSelectedDestination(item)}
+        style={styles.item}
+      >
+        <View>
+          <Image source={{ uri: item.image }} style={styles.image} />
+        </View>
+        <View>
+          <Text style={styles.textCard}>{item.title}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerContent}>
@@ -113,32 +136,49 @@ const Home = () => {
       <View>
         <Text style={styles.headerText}>Mejores Lugares Turisticos</Text>
       </View>
+      {/* Agregamos la FlatList de destinos */}
       <FlatList
         data={dataPlaces}
-        renderItem={renderItem}
+        renderItem={renderItemDestinations}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.container}
       />
       <View>
-        <Text style={styles.headerText}>Mejores Hoteles Del Perú</Text>
+        <Text style={styles.headerText}>Mejores Lugares Hoteles</Text>
       </View>
     </View>
-    
   );
 
   return (
     <View style={styles.container}>
-      
+      {/* Renderizamos el encabezado y la FlatList de hoteles */}
       <FlatList
         ListHeaderComponent={renderHeader}
         data={dataHotels}
-        renderItem={renderItem}
+        renderItem={renderItemHotel}
         keyExtractor={(item) => item.id}
         numColumns={2}
         contentContainerStyle={styles.container}
       />
-      
+
+      {/* Mostramos el modal del hotel seleccionado */}
+      {selectedHotel && (
+        <ModalHotel
+          item={selectedHotel}
+          modalVisible={selectedHotel !== null}
+          closeModal={() => setSelectedHotel(null)}
+        />
+      )}
+
+      {/* Mostramos el modal del destino seleccionado */}
+      {selectedDestination && (
+        <ModalDestination
+          item={selectedDestination}
+          modalVisible={selectedDestination !== null}
+          closeModal={() => setSelectedDestination(null)}
+        />
+      )}
     </View>
   );
 };
